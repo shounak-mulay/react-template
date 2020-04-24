@@ -2,6 +2,8 @@ import React, { useEffect, memo, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
+import firebaseui from 'firebaseui';
+import firebase from 'firebase';
 import { compose } from 'redux';
 import _ from 'lodash';
 import { Card, Skeleton, Input } from 'antd';
@@ -58,13 +60,48 @@ export function HomeContainer({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    if (!firebase.apps.length) {
+      var firebaseConfig = {
+        apiKey: 'AIzaSyBKNKnTIB7dIfKkLUua-lIIzChwdke_wEc',
+        projectId: 'paycore-dev',
+        appId: 'paycore-dev'
+      };
+      firebase.initializeApp(firebaseConfig);
+    }
+
+    // var ui = new firebaseui.auth.AuthUI(firebase.auth());
+    var actionCodeSettings = {
+      url: 'http://localhost:3000/',
+      // This must be true.
+      handleCodeInApp: true
+    };
+    firebase
+      .auth()
+      .signInWithEmailLink('mac@wednesday.is', window.location.href)
+      .then(function(result) {
+        // Clear email from storage.
+        window.localStorage.removeItem('emailForSignIn');
+        // You can access the new user via result.user
+        // Additional user info profile not available via:
+        // result.additionalUserInfo.profile == null
+        // You can check if the user is new or existing:
+        // result.additionalUserInfo.isNewUser
+        console.log({ result });
+      })
+      .catch(function(error) {
+        // Some error occurred, you can inspect the code: error.code
+        // Common errors could be invalid email and invalid or expired OTPs.
+      });
+    firebase
+      .auth()
+      .sendSignInLinkToEmail('mac@wednesday.is', actionCodeSettings);
     // Effects will be called instead of componentDidMount, componentDidUpdate, componentWillRecieveProps
     // This effect will be called for every render.
     const loaded = _.get(reposData, 'items', null) || reposError;
     if (loading && loaded) {
       setLoading(false);
     }
-  });
+  }, []);
 
   const handleOnChange = rName => {
     if (rName) {
