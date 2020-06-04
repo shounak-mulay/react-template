@@ -9,7 +9,7 @@ import isEmpty from 'lodash/isEmpty';
 import { Card, Skeleton, Input } from 'antd';
 import styled from 'styled-components';
 import { injectIntl } from 'react-intl';
-import { useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 import T from '@components/T';
 import Clickable from '@components/Clickable';
 import { useInjectSaga } from 'utils/injectSaga';
@@ -97,13 +97,20 @@ export function HomeContainer({
                 <T id="matching_repos" values={{ totalCount }} />
               </div>
             )}
-            {items.map((item, index) => (
-              <CustomCard key={index}>
-                <div>Repository Name: {item.name}</div>
-                <div>Repository Full Name: {item.fullName}</div>
-                <div>Repository stars: {item.stargazersCount}</div>
-              </CustomCard>
-            ))}
+            {items.map((item, index) => {
+              return (
+                <Link
+                  key={index}
+                  to={`/${item.owner.login}/${item.name}/issues`}
+                >
+                  <CustomCard key={index}>
+                    <div>Repository Name: {item.name}</div>
+                    <div>Repository Full Name: {item.fullName}</div>
+                    <div>Repository stars: {item.stargazersCount}</div>
+                  </CustomCard>
+                </Link>
+              );
+            })}
           </Skeleton>
         </CustomCard>
       )
