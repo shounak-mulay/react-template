@@ -8,6 +8,7 @@ export const {
   Creators: issuesContainerCreators
 } = createActions({
   requestGetRepoIssues: ['userName', 'repoName'],
+  clearRepoIssues: [],
   successGetRepoIssues: ['data'],
   failureGetRepoIssues: ['error']
 });
@@ -21,13 +22,17 @@ export const issuesContainerReducer = (state = initialState, action) =>
         return initialState
           .set('userName', action.userName)
           .set('repoName', action.repoName);
+      case issuesContainerTypes.CLEAR_REPO_ISSUES:
+        return initialState;
       case issuesContainerTypes.SUCCESS_GET_REPO_ISSUES:
-        return state.set('issuesData', action.data);
+        return state.set('issuesData', action.data).set('loaded', true);
       case issuesContainerTypes.FAILURE_GET_REPO_ISSUES:
-        return state.set(
-          'issuesError',
-          _.get(action.error, 'message', 'something_went_wrong')
-        );
+        return state
+          .set(
+            'issuesError',
+            _.get(action.error, 'message', 'something_went_wrong')
+          )
+          .set('loaded', true);
     }
     return state;
   });

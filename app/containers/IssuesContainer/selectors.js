@@ -17,6 +17,12 @@ export const selectIssuesData = () =>
     substate => _.get(substate, 'issuesData', [])
   );
 
+export const selectLoaded = () =>
+  createSelector(
+    selectIssuesContainerDomain,
+    substate => _.get(substate, 'loaded', false)
+  );
+
 export const selectIssuesError = () =>
   createSelector(
     selectIssuesContainerDomain,

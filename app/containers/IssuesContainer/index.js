@@ -14,8 +14,10 @@ import selectIssuesContainer, {
   selectIssuesData,
   selectIssuesError,
   selectRepoName,
-  selectUserName
+  selectUserName,
+  selectLoaded
 } from './selectors';
+import * as isEmpty from 'lodash/isEmpty';
 
 const Container = styled.div`
   && {
@@ -46,7 +48,11 @@ const CustomCard = styled(Card)`
 
 export function IssuesContainer({
   dispatchRepoIssues,
+  dispatchClearRepoIssues,
+  repoName,
+  userName,
   issuesData = [],
+  loaded,
   issuesError = null,
   maxWidth,
   padding
@@ -56,15 +62,15 @@ export function IssuesContainer({
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loaded = issuesData !== null && issuesData.length > 0;
+    debouncedHandleOnLoad(owner, repo);
+    return dispatchClearRepoIssues;
+  }, []);
+
+  useEffect(() => {
     if (loading && loaded) {
       setLoading(false);
     }
-  }, [issuesData]);
-
-  useEffect(() => {
-    debouncedHandleOnLoad(owner, repo);
-  }, []);
+  }, [issuesData, issuesError]);
 
   const handleOnLoad = (owner, repo) => {
     dispatchRepoIssues(owner, repo);
@@ -91,27 +97,52 @@ export function IssuesContainer({
     }
   };
 
-  const renderIssuesList = () => {
+  const renderErrorState = () => {
     return (
-      ((issuesData !== null && issuesData.length !== 0) || loading) && (
-        <CustomCard>
-          <Skeleton loading={loading} active>
-            {issuesData.map((data, index) => {
-              return (
-                <a key={index} href={data.htmlUrl}>
-                  <CustomCard title={data.title} key={index}>
-                    <div>Issues Number: {data.number} </div>
-                    <div>State: {data.state}</div>
-                    <div>Labels: {renderLabels(data.labels)}</div>
-                  </CustomCard>
-                </a>
-              );
-            })}
-          </Skeleton>
+      loaded &&
+      issuesError && (
+        <CustomCard
+          color="red"
+          title={`No Issues Found For ${repoName} By ${userName}`}
+        >
+          <div>Error Message: {`"${issuesError || 'No Issues Found'}"`}</div>
         </CustomCard>
       )
     );
   };
+
+  const renderIssuesList = () => {
+    if (!isEmpty(issuesData) || loading) {
+      return (
+        !issuesError && (
+          <CustomCard>
+            <Skeleton loading={loading} active>
+              {issuesData.map((data, index) => {
+                return (
+                  <a key={index} href={`${data.htmlUrl}`}>
+                    <CustomCard title={data.title} key={index}>
+                      <div>Issues Number: {data.number} </div>
+                      <div>State: {data.state}</div>
+                      <div>Labels: {renderLabels(data.labels)}</div>
+                    </CustomCard>
+                  </a>
+                );
+              })}
+            </Skeleton>
+          </CustomCard>
+        )
+      );
+    } else if (loaded && !issuesError) {
+      return (
+        <CustomCard>
+          <div>
+            No Issues Present For {repoName} By {userName}
+          </div>
+        </CustomCard>
+      );
+    }
+  };
+
   return (
     <Container maxWidth={maxWidth} padding={padding}>
       <CustomCard title={`Issues for Repository: ${repo}`}>
@@ -120,13 +151,18 @@ export function IssuesContainer({
         </div>
       </CustomCard>
       {renderIssuesList()}
+      {renderErrorState()}
     </Container>
   );
 }
 
 IssuesContainer.propTypes = {
   dispatchRepoIssues: PropTypes.func,
+  dispatchClearRepoIssues: PropTypes.func,
+  repoName: PropTypes.string,
+  userName: PropTypes.string,
   issuesData: PropTypes.array,
+  loaded: PropTypes.bool,
   issuesError: PropTypes.string,
   maxWidth: PropTypes.number,
   padding: PropTypes.number
@@ -140,16 +176,20 @@ IssuesContainer.defaultProps = {
 const mapStateToProps = createStructuredSelector({
   issuesContainer: selectIssuesContainer(),
   issuesData: selectIssuesData(),
+  loaded: selectLoaded(),
   issuesError: selectIssuesError(),
   repoName: selectRepoName(),
   userName: selectUserName()
 });
 
 function matchDispatchToProps(dispatch) {
-  const { requestGetRepoIssues } = issuesContainerCreators;
+  const { requestGetRepoIssues, clearRepoIssues } = issuesContainerCreators;
   return {
     dispatchRepoIssues: (userName, repoName) => {
       return dispatch(requestGetRepoIssues(userName, repoName));
+    },
+    dispatchClearRepoIssues: () => {
+      return dispatch(clearRepoIssues());
     }
   };
 }
