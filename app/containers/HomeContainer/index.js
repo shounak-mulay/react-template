@@ -21,6 +21,7 @@ import {
 } from './selectors';
 import { homeContainerCreators } from './reducer';
 import saga from './saga';
+import For from '@components/For';
 
 const { Search } = Input;
 
@@ -97,20 +98,32 @@ export function HomeContainer({
                 <T id="matching_repos" values={{ totalCount }} />
               </div>
             )}
-            {items.map((item, index) => {
-              return (
-                <Link
-                  key={index}
-                  to={`/${item.owner.login}/${item.name}/issues`}
-                >
-                  <CustomCard key={index}>
-                    <div>Repository Name: {item.name}</div>
-                    <div>Repository Full Name: {item.fullName}</div>
-                    <div>Repository stars: {item.stargazersCount}</div>
-                  </CustomCard>
-                </Link>
-              );
-            })}
+            <For
+              isRow={false}
+              of={items}
+              renderItem={(item, index) => {
+                return (
+                  <Link
+                    key={index}
+                    to={`/${item.owner.login}/${item.name}/issues`}
+                  >
+                    <CustomCard key={index}>
+                      <div>
+                        {intl.formatMessage({ id: 'repo_name' })}: {item.name}
+                      </div>
+                      <div>
+                        {intl.formatMessage({ id: 'repo_full_name' })}:{' '}
+                        {item.fullName}
+                      </div>
+                      <div>
+                        {intl.formatMessage({ id: 'repo_stars' })}:{' '}
+                        {item.stargazersCount}
+                      </div>
+                    </CustomCard>
+                  </Link>
+                );
+              }}
+            />
           </Skeleton>
         </CustomCard>
       )

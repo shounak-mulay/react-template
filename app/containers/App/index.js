@@ -40,7 +40,7 @@ export function App({ location }) {
               <Route
                 exact={routeConfig[routeKey].exact}
                 key={index}
-                path={`${routeConfig[routeKey].route}`}
+                path={routeConfig[routeKey].route}
                 render={props => {
                   const updatedProps = {
                     ...props,

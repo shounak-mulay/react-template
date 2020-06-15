@@ -7,6 +7,7 @@ import { compose } from 'redux';
 import { useParams } from 'react-router-dom';
 import debounce from 'lodash/debounce';
 import { useInjectSaga } from 'utils/injectSaga';
+import { injectIntl } from 'react-intl';
 import { createStructuredSelector } from 'reselect';
 import { issuesContainerCreators } from './reducer';
 import saga from './saga';
@@ -18,6 +19,7 @@ import selectIssuesContainer, {
   selectLoaded
 } from './selectors';
 import * as isEmpty from 'lodash/isEmpty';
+import For from '@app/components/For/index';
 
 const Container = styled.div`
   && {
@@ -54,6 +56,7 @@ export function IssuesContainer({
   issuesData = [],
   loaded,
   issuesError = null,
+  intl,
   maxWidth,
   padding
 }) {
@@ -80,7 +83,7 @@ export function IssuesContainer({
   const debouncedHandleOnLoad = debounce(handleOnLoad, 200);
 
   const renderLabels = labels => {
-    if (labels !== null && labels.length) {
+    if (labels?.length) {
       return (
         <div style={{ display: 'inline' }}>
           {labels.map((label, index) => {
@@ -111,23 +114,35 @@ export function IssuesContainer({
     );
   };
 
+  const renderIssueListItem = (data, index) => {
+    return (
+      <a key={index} href={`${data.htmlUrl}`}>
+        <CustomCard title={data.title} key={index}>
+          <div>
+            {intl.formatMessage({ id: 'issue_number' })}: {data.number}
+          </div>
+          <div>
+            {intl.formatMessage({ id: 'state' })}: {data.state}
+          </div>
+          <div>
+            {intl.formatMessage({ id: 'labels' })}: {renderLabels(data.labels)}
+          </div>
+        </CustomCard>
+      </a>
+    );
+  };
+
   const renderIssuesList = () => {
     if (!isEmpty(issuesData) || loading) {
       return (
         !issuesError && (
           <CustomCard>
             <Skeleton loading={loading} active>
-              {issuesData.map((data, index) => {
-                return (
-                  <a key={index} href={`${data.htmlUrl}`}>
-                    <CustomCard title={data.title} key={index}>
-                      <div>Issues Number: {data.number} </div>
-                      <div>State: {data.state}</div>
-                      <div>Labels: {renderLabels(data.labels)}</div>
-                    </CustomCard>
-                  </a>
-                );
-              })}
+              <For
+                isRow={false}
+                of={issuesData}
+                renderItem={renderIssueListItem}
+              />
             </Skeleton>
           </CustomCard>
         )
@@ -165,7 +180,8 @@ IssuesContainer.propTypes = {
   loaded: PropTypes.bool,
   issuesError: PropTypes.string,
   maxWidth: PropTypes.number,
-  padding: PropTypes.number
+  padding: PropTypes.number,
+  intl: PropTypes.object
 };
 
 IssuesContainer.defaultProps = {
@@ -200,6 +216,7 @@ const withConnect = connect(
 );
 
 export default compose(
+  injectIntl,
   withConnect,
   memo
 )(IssuesContainer);

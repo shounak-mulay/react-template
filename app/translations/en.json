@@ -1,5 +1,8 @@
 {
   "repo_list": "Repository List",
+  "repo_name": "Repository Name",
+  "repo_full_name": "Repository Full Name",
+  "repo_stars": "Repository Stars",
   "repo_search": "Repository Search",
   "respo_search_default": "Search for a repository by entering it's name in the search box",
   "get_repo_details": "Get details of repositories",
@@ -7,5 +10,8 @@
   "matching_repos": "Total number of matching repos: {totalCount}",
   "something_went_wrong": "Sorry. Something went wrong! Please try again in sometime.",
   "stories": "Go to Storybook",
-  "wednesday_solutions": "Wednesday Solutions"
+  "wednesday_solutions": "Wednesday Solutions",
+  "issue_number": "Issue Number",
+  "state": "State",
+  "labels": "Labels"
 }
