@@ -22,7 +22,7 @@ exports[`<HomeContainer /> tests should render and match the snapshot 1`] = `
         </div>
       </div>
       <div
-        class="ant-card HomeContainer__CustomCard-l0s8pp-0 lmrrxl ant-card-bordered"
+        class="ant-card HomeContainer__CustomCard-l0s8pp-0 ijtDKe ant-card-bordered"
         maxwidth="500"
       >
         <div
@@ -85,7 +85,7 @@ exports[`<HomeContainer /> tests should render and match the snapshot 1`] = `
         </div>
       </div>
       <div
-        class="ant-card HomeContainer__CustomCard-l0s8pp-0 IwsfX ant-card-bordered"
+        class="ant-card HomeContainer__CustomCard-l0s8pp-0 dzAXRq ant-card-bordered"
         color="grey"
       >
         <div

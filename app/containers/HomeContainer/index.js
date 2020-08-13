@@ -24,6 +24,7 @@ const CustomCard = styled(Card)`
     margin: 25px 0;
     max-width: ${props => props.maxwidth};
     color: ${props => props.color};
+    background-color: ${props => props.backgroundColor};
     ${props => props.color && `color: ${props.color}`};
   }
 `;
@@ -98,7 +99,7 @@ export function HomeContainer({
               </div>
             )}
             {items.map((item, index) => (
-              <CustomCard key={index}>
+              <CustomCard backgroundColor="#fff9ed" key={index}>
                 <T id="repository_name" values={{ name: item.name }} />
                 <T id="repository_full_name" values={{ fullName: item.fullName }} />
                 <T id="repository_stars" values={{ stars: item.stargazersCount }} />
